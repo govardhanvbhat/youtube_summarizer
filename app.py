@@ -5,7 +5,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 import re
-from twilio.rest import Client
 
 def load_environment():
     """Load environment variables"""
