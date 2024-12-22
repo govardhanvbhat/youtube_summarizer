@@ -29,28 +29,6 @@ except Exception as e:
     st.error(f"Error initializing API client: {str(e)}")
     st.stop()
 
-def send_summary_via_sms(summary, recipient_number):
-    """Send the generated summary via SMS using Twilio"""
-    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-    twilio_number = os.getenv('TWILIO_PHONE_NUMBER')
-    
-    if not all([account_sid, auth_token, twilio_number]):
-        st.error("Twilio API credentials are missing in the environment variables.")
-        return False
-    
-    try:
-        client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body=summary,
-            from_=twilio_number,
-            to=recipient_number
-        )
-        return True
-    except Exception as e:
-        st.error(f"Failed to send SMS: {str(e)}")
-        return False
-
 def extract_video_id(youtube_url):
     """Extract video ID from different YouTube URL formats"""
     patterns = [
@@ -334,7 +312,7 @@ def main():
         mode = mode.lower()
 
     if st.button('Generate Summary'):
-        if link:  # Check if a YouTube link is provided
+        if link:
             try:
                 with st.spinner('Processing...'):
                     progress = st.progress(0)
@@ -358,23 +336,10 @@ def main():
                     status_text.text('✨ Summary Ready!')
                     st.markdown(summary)
                     progress.progress(100)
-
-                    # Add SMS sharing functionality
-                    if summary:
-                        st.markdown("### 📤 Share the Summary")
-                        phone_number = st.text_input("📱 Enter the recipient's phone number (e.g., +1234567890):")
-                        
-                        if st.button("Send Summary via SMS"):
-                            if phone_number:
-                                success = send_summary_via_sms(summary, phone_number)
-                                if success:
-                                    st.success("📤 Summary sent successfully!")
-                                else:
-                                    st.error("Failed to send the summary. Please check the phone number or try again.")
-                            else:
-                                st.warning("Please enter a valid phone number.")
-
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
         else:
             st.warning('Please enter a valid YouTube link.')
+
+if __name__ == "__main__":
+    main()
